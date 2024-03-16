@@ -19,7 +19,7 @@ This sketch was tested succesfully in various Arduino environments:
 The I2C scanning feature can be used to scan generic I2C devices, but only T13I2C devices enable the extra menu items for configuration.
 
 ## Usage notes
-- use a serial connection (115200 bps) to see the menu
+- use a serial connection (115200 bps) to see the menu. Do NOT send line-endings (LF or CR).
 - if needed add 10k pull-ups on the I2C lines
 - use S to scan for up to 10 devices, then use 0-9 to select the device
 - the 0xF3 and 0xFF commands are written to detect if an I2C device follows the T13I2C protocol
