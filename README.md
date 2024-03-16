@@ -20,7 +20,7 @@ It can receive write commands and respond to read data-requests for the set I2C 
 ```
 Following the pinout of 8-pin chips like the AT24C32 EEPROM, this library defaults to using pins PB0 and PB1 as SDA and SCL. These pins are defined in [TinySoftWire.h](src/TinySoftWire.h)
 
-### Usage and examples
+## Usage and examples
 
 A typical Arduino application uses setup() to initialize things:
 ```
@@ -40,7 +40,7 @@ The TinySoftWire::getLastStatus() method is used to check if data was received:
    if(myWire.getLastStatus()==I2C_STATUS_WRITE && nProcessed)   i2cAfterWrite(nProcessed);
 ```
 
-Various getData and setData methods are provided to see what was received and to set the reply data. Specific values can be used to implement a special I2C protocol for ATtiny devices:
+Various getData and setData methods are provided to see what was received and to set the reply data. Specific values can be used to implement a [special I2C protocol](#t13i2c-protocol) for ATtiny devices:
 ```
   switch(myWire.getDataU8(0))
   {
@@ -59,6 +59,16 @@ Various getData and setData methods are provided to see what was received and to
 
 See the [library examples](/examples) for more information on how to use this library.
 
+## T13I2C protocol
+Using the TinySoftWire library an ATtiny13A can receive I2C data. To make configuring ATtiny I2C devices easier, a common protocol can be implemented. When using this T13I2C protocol, data is preceeded by single-byte commands. Commands F0-FF are reserved for special common purposes. The reserved commands depend on the device, but may include the following:
+  - 0xF1  - switch to data mode: no further command processing*
+  - 0xF3  - get the I2C-address (can be used to verify T13I2C protocol support
+  - 0xF4  - change the I2C address and store it in EEPROM
+  - 0xF6  - reset the I2C address to default device address
+  - 0xFF  - get the T13I2C device type ID (4-bytes)
+*) When in data mode sending the device type ID to the device switches back to command mode.
+See the [library examples](/examples) for more information on how they implement the T13I2C protocol.
+An example configuration tool will be added soon!
 
 ## Features & limitations
 - I2C scanning is supported, but the sketch needs to respond quickly to precent skipped addresses.
