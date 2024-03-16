@@ -9,7 +9,7 @@ Using the TinySoftWire library an ATtiny13A can receive I2C data. To make config
   - 0xF4  - change the I2C address and store it in EEPROM
   - 0xF6  - reset the I2C address to default device address
   - 0xFF  - get the T13I2C device type ID (4-bytes)
-  - 
+
 *) When in data mode sending the device type ID to the device switches back to command mode.
 
 See the [library examples](/examples) for more information on how they implement the T13I2C protocol.
