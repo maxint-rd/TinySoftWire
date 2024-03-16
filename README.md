@@ -5,10 +5,11 @@ Make peripheral devices such as sensors using software I2C on ATtiny MCUs. Examp
 
 DISCLAIMER - This library is work-in-progress. USE AT YOUR OWN RISK!
 
-TinySoftWare ATtiny13A I2C peripheral library for bitbanging I2C.
+TinySoftWare is an I2C peripheral library for bitbanging I2C on the ATtiny13A and similar processors.
 Turn the ATtiny13A into an I2C device that properly responds to an I2C controller.
 Using this library the ATtiny13A at 9.6MHz can perform 100kbps [I2C communication](#i2c-protocol-simplified).
 It can receive write commands and respond to read data-requests for the set I2C address.
+While fully programmed in C++ the code was kept small to spare room for a useful applictions.
 
 ## Pinout ATtiny13A
 ```
@@ -41,7 +42,7 @@ The TinySoftWire::getLastStatus() method is used to check if data was received:
    if(myWire.getLastStatus()==I2C_STATUS_WRITE && nProcessed)   i2cAfterWrite(nProcessed);
 ```
 
-Various getData and setData methods are provided to see what was received and to set the reply data. Specific values can be used to implement a [special I2C protocol](#t13i2c-protocol) for ATtiny devices:
+Various getData and setData methods are provided to see what was received and to set the reply data. Specific values can be used to implement commands. Most library examples implement a [special I2C protocol](#t13i2c-protocol) for easy configuration of ATtiny devices:
 ```
   switch(myWire.getDataU8(0))
   {
@@ -73,7 +74,7 @@ See the [library examples](/examples) for more information on how they implement
 An example configuration tool will be added soon!
 
 ## Features & limitations
-- I2C scanning is supported, but the sketch needs to respond quickly to prevent skipped addresses.
+- I2C scanning is supported, but the periphiral device needs to respond quickly to prevent skipped addresses.
 - Written fully in C++ as sufficient assembly skills were lacking. Better performance may be obtained using assembly.
 - Unfortunately interrupts seem to be too slow on the ATtiny13A @ 9.6MHz, requiring continuous calls to TinySoftWire::process()
 - Using this library the ATtiny13A at 9.6MHz can perform 100kHz I2C communication. Recognizing the address and acking after clock-pulse 8 now takes 4.5us. At 100Kbps each pulse is only 5us, so 400 kHz is much too fast. 
@@ -113,9 +114,8 @@ An example configuration tool will be added soon!
 ```
 
 ### Links & references
-For full documentation of the I2C protocol see https://www.nxp.com/docs/en/user-guide/UM10204.pdf
-For more info and an I2C implementation in BascomAVR/assembly see Elektor 2009-01 page 52-54.
-  (https://www.elektormagazine.nl/magazine/elektor-200901/15674/)
+- For full documentation of the I2C protocol see https://www.nxp.com/docs/en/user-guide/UM10204.pdf [mirror](documents/UM10204.pdf)
+- For more info and an I2C implementation in BascomAVR/assembly see [Elektor 2009-01 page 52-54](https://www.elektormagazine.nl/magazine/elektor-200901/15674/).
 
 ## Disclaimer
 - All code on this GitHub account, including this library is provided to you on an as-is basis without guarantees and with all liability dismissed. It may be used at your own risk. Unfortunately I have no means to provide support.
