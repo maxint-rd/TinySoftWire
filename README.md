@@ -6,7 +6,7 @@ DISCLAIMER - This library is work-in-progress. USE AT YOUR OWN RISK!
 
 TinySoftWare ATtiny13A I2C peripheral library for bitbanging I2C.
 Turn the ATtiny13A into an I2C device that properly responds to an I2C controller.
-Using this library the ATtiny13A at 9.6MHz can perform 100kbps I2C communication.
+Using this library the ATtiny13A at 9.6MHz can perform 100kbps [I2C communication](#i2c-protocol-simplified).
 It can receive write commands and respond to read data-requests for the set I2C address.
 
 ## Pinout ATtiny13A
@@ -60,12 +60,13 @@ Various getData and setData methods are provided to see what was received and to
 See the [library examples](/examples) for more information on how to use this library.
 
 ## T13I2C protocol
-Using the TinySoftWire library an ATtiny13A can receive I2C data. To make configuring ATtiny I2C devices easier, a common protocol can be implemented. When using this T13I2C protocol, data is preceeded by single-byte commands. Commands F0-FF are reserved for special common purposes. The reserved commands depend on the device, but may include the following:
+Using the TinySoftWire library an ATtiny13A can receive [I2C data](#i2c-protocol-simplified). To make configuring ATtiny I2C devices easier, a common protocol can be implemented. When using this T13I2C protocol, data is preceeded by single-byte commands. Commands F0-FF are reserved for special common purposes. The reserved commands depend on the device, but may include the following:
   - 0xF1  - switch to data mode: no further command processing*
   - 0xF3  - get the I2C-address (can be used to verify T13I2C protocol support
   - 0xF4  - change the I2C address and store it in EEPROM
   - 0xF6  - reset the I2C address to default device address
   - 0xFF  - get the T13I2C device type ID (4-bytes)
+
 *) When in data mode sending the device type ID to the device switches back to command mode.
 See the [library examples](/examples) for more information on how they implement the T13I2C protocol.
 An example configuration tool will be added soon!
