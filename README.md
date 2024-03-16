@@ -2,6 +2,7 @@
 TinySoftWire for Arduino. A tiny I2C library to make peripherals from ATtiny13A and similar MCUs.
 
 Make peripheral devices such as sensors using software I2C on ATtiny MCUs. Examples included.
+
 DISCLAIMER - This library is work-in-progress. USE AT YOUR OWN RISK!
 
 TinySoftWare ATtiny13A I2C peripheral library for bitbanging I2C.
@@ -72,7 +73,7 @@ See the [library examples](/examples) for more information on how they implement
 An example configuration tool will be added soon!
 
 ## Features & limitations
-- I2C scanning is supported, but the sketch needs to respond quickly to precent skipped addresses.
+- I2C scanning is supported, but the sketch needs to respond quickly to prevent skipped addresses.
 - Written fully in C++ as sufficient assembly skills were lacking. Better performance may be obtained using assembly.
 - Unfortunately interrupts seem to be too slow on the ATtiny13A @ 9.6MHz, requiring continuous calls to TinySoftWire::process()
 - Using this library the ATtiny13A at 9.6MHz can perform 100kHz I2C communication. Recognizing the address and acking after clock-pulse 8 now takes 4.5us. At 100Kbps each pulse is only 5us, so 400 kHz is much too fast. 
