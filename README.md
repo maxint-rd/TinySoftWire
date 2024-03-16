@@ -82,6 +82,11 @@ An example configuration tool will be added soon!
 
 ## More information
 
+### Solving I2C communication problems
+- The relatively slow processing of the ATtiny13A may cause lost clock pulses and data changes. Most critical is sending back the acknowledgement in time. All data processing should be done as quickly as possible. Sometimes adding/changing pull-up resistors on the I2C lines can help. When processors such as the CH32V003 as controller, these are essential, but on others they seem not required.  In my experiments with an ESP8266 I found adding capacitors much more helpful. Place low value capacitors (<400pF, see table 10 of I2C specs) between SDA/SCL and ground. Having such a capacitor only on SCL (A5) may improve communication sufficiently. Effectively this delays the signals a bit, 47pF worked fine for me.
+- Having long wires and loose breadboard connections may cause noise and weak signals. This is more problematic at higher speeds. Try to keep the length short and verify the connection.
+- Alternatively one can change the speed of the I2C communication. Using Wire.setClock() may be limited to few supported speeds. On the Atmel chips such as the ATmega328P (and LGT8F328P) one can set the TWBR/TWPS registers. (Higher TWBR values result in lower speeds). See for more info [this fine post](http://www.gammon.com.au/forum/?id=10896) by Nick Gammon. Note that the time-outs set in the T13I2C library prevent support of very low speeds (below 10kHz).
+
 ### I2C protocol (simplified) 
 ```
  START CONDITION: 
