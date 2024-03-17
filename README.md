@@ -3,13 +3,21 @@ TinySoftWire for Arduino. A tiny I2C library to make peripherals from ATtiny13A 
 
 Make peripheral devices such as sensors using software I2C on ATtiny MCUs. Examples included.
 
-DISCLAIMER - This library is work-in-progress. USE AT YOUR OWN RISK!
+DISCLAIMER - This library is work-in-progress. **USE AT YOUR OWN RISK!**
 
 TinySoftWare is an I2C peripheral library for bitbanging I2C on the ATtiny13A and similar processors.
 Turn the ATtiny13A into an I2C device that properly responds to an I2C controller.
 Using this library the ATtiny13A at 9.6MHz can perform 100kbps [I2C communication](#i2c-protocol-simplified).
 It can receive write commands and respond to read data-requests for the set I2C address.
 While fully programmed in C++ the code was kept small to spare room for a useful applictions.
+
+## Table of contents
+- [Pinout ATtiny13A](#pinout-attiny13a)
+- [Usage and examples](#usage-and-examples)
+- [T13I2C protocol](#t13i2c-protocol)
+- [Features & limitations](#features--limitations)
+- [More information](#more-information)
+- [Disclaimer](#disclaimer)
 
 ## Pinout ATtiny13A
 ```
@@ -24,45 +32,49 @@ Following the pinout of 8-pin chips like the AT24C32 EEPROM, this library defaul
 
 ## Usage and examples
 
-A typical Arduino application uses setup() to initialize things:
+The sketch below shows the minimal code required to use this library. All it really does is calling the _process()_ method, which will put received data in the 4-byte internal buffer and return that very same data when it's read. The [I2C echo example](examples/I2C_echo/I2C_echo.ino) expands this minimal code with use of the watchdog to automatically reset when communication is blocked.
 ```
-  myWire.begin(0x2D);
-```
-The [library examples](/examples) show how to use the EEPROM of the ATtiny to store the address.
+#include <TinySoftWire.h>
+TinySoftWire myWire=TinySoftWire();
 
-When setup() is done, the loop() function runs continuously to receive data and commands and to process them:
-```
-   byte nProcessed=myWire.process();
-```
+void setup() {
+  myWire.begin(0x4D);      // initialize using address 0x4D
+}
 
-This library uses polling to implement I2C. Unfortunately interrupts seem to be too slow on the ATtiny13A @ 9.6MHz. For that reason continuous calls to TinySoftWire::process() are required and the actual processing of received data/commands needs to be done quickly.
-
-The TinySoftWire::getLastStatus() method is used to check if data was received:
-```
-   if(myWire.getLastStatus()==I2C_STATUS_WRITE && nProcessed)   i2cAfterWrite(nProcessed);
+void loop() {
+  myWire.process();        // process receiving and transmitting data from the buffer
+}
 ```
 
-Various getData and setData methods are provided to see what was received and to set the reply data. Specific values can be used to implement commands. Most library examples implement a [special I2C protocol](#t13i2c-protocol) for easy configuration of ATtiny devices:
+To make the ATtiny I2C device more useful, it can accept single byte commands, such as a command to change the I2C address. The internal EEPROM of the ATtiny can be used to store the changed address. Most [library examples](/examples) implement a [special I2C protocol](#t13i2c-protocol) for easy configuration of ATtiny I2C devices using the included [T13I2C device configurator](examples/mxT13_I2C_device_configurator) sketch.
+
+This library uses polling to implement [I2C](#i2c-protocol-simplified). (Unfortunately interrupts seem to be too slow on the ATtiny13A @ 9.6MHz). For that reason continuous calls to _TinySoftWire::process()_ are required and the actual processing of received data/commands needs to be done quickly.
+
+The _getLastStatus()_ method is used to check if data was written to the device. Various _getData_ and _setData_ methods are provided to see what was received and to set the reply data. (Refer to [TinySoftWire.h](src/TinySoftWire.h) for the complete list). Specific values can be used to implement commands:
 ```
+byte nProcessed=myWire.process();
+if(myWire.getLastStatus()==I2C_STATUS_WRITE && nProcessed)
+{
   switch(myWire.getDataU8(0))
   {
-  case 0xF0:  // blip n times
-    // blip the number of times specified
+  case 0xF0:  // blip the number of times specified
     blip(myWire.getDataU8(1));
     break;
   case 0xF3:  // get I2C address in next read, used to verify if this device is an T13I2C device.
     myWire.setDataU8(0, _i2cAddress);
     break;
-  case 0xFF:   // get the device type id
-    myWire.setDataU32(0, DEVICETYPEID);
+  case 0xFF:  // get the device type id, used to identify the device type
+    myWire.setDataU32(0, 0xCODEDBAD);  // a 4-byte HEX-value can form a recognizable type ID 
     break;
    }
+}
 ```
+Note that the code above sets the reply data when a single byte command was written; requiring the controller to issue a subsequent I2C read to receive that reply.
 
-See the [library examples](/examples) for more information on how to use this library.
+See the [library examples](/examples) for more details on using this library. The [I2C_ADC example](examples/I2C_ADC) shows the various features used to implement a 4-channel ADC converter. The [TM1637](examples/I2C_gateway_TM1637) and [TM1650](examples/I2C_gateway_TM1650) gateway examples demonstrate how non-I2C devices can be given an I2C interface to make them addressable and connect to a shared bus. 
 
 ## T13I2C protocol
-Using the TinySoftWire library an ATtiny13A can receive [I2C data](#i2c-protocol-simplified). To make configuring ATtiny I2C devices easier, a common protocol can be implemented. When using this T13I2C protocol, data is preceeded by single-byte commands. Commands F0-FF are reserved for special common purposes. The reserved commands depend on the device, but may include the following:
+Using the TinySoftWire library an ATtiny13A can process [I2C data](#i2c-protocol-simplified). To make configuring ATtiny I2C devices easier, a common protocol can be implemented. When using this T13I2C protocol, data is preceeded by single byte commands. Commands F0-FF are reserved for special common purposes. The reserved commands depend on the device, but may include the following:
   - 0xF1  - switch to data mode: no further command processing*
   - 0xF3  - get the I2C-address (can be used to verify T13I2C protocol support
   - 0xF4  - change the I2C address and store it in EEPROM
@@ -77,10 +89,11 @@ Use the [T13I2C device configurator](examples/mxT13_I2C_device_configurator) ske
 ## Features & limitations
 - I2C scanning is supported, but the periphiral device needs to respond quickly to prevent skipped addresses.
 - Written fully in C++ as sufficient assembly skills were lacking. Better performance may be obtained using assembly.
-- Unfortunately interrupts seem to be too slow on the ATtiny13A @ 9.6MHz, requiring continuous calls to TinySoftWire::process()
-- Using this library the ATtiny13A at 9.6MHz can perform 100kHz I2C communication. Recognizing the address and acking after clock-pulse 8 now takes 4.5us. At 100Kbps each pulse is only 5us, so 400 kHz is much too fast. 
-- No clock-stretching was implemented (SLC is not kept low while prepping data)
-- General call write/read at address 0x00 is not implemented
+- Unfortunately interrupts seem to be too slow on the ATtiny13A @ 9.6MHz, requiring continuous calls to TinySoftWire::process().
+- Using this library the ATtiny13A at 9.6MHz can perform 100kHz I2C communication. Recognizing the address and acking after clock-pulse 8 now takes 4.5us. At 100Kbps each pulse is only 5us, so 400 kHz is much too fast.
+- This library only implements 7-bit addressing. General call write/read at address 0x00 is not implemented.
+- No clock-stretching was implemented (SLC is not kept low while prepping data).
+- To keep things small and simple the internal buffer is only 4-bytes long. This size is defined in [TinySoftWire.h](src/TinySoftWire.h) and could be increased, but that would require implementation of supporting functions.
 
 ## More information
 
@@ -115,7 +128,7 @@ Use the [T13I2C device configurator](examples/mxT13_I2C_device_configurator) ske
 ```
 
 ### Links & references
-- For full documentation of the I2C protocol see https://www.nxp.com/docs/en/user-guide/UM10204.pdf [mirror](documents/UM10204.pdf)
+- For full documentation of the I2C protocol see the [NXP I<sup>2</sup>C specification and user manual](https://www.nxp.com/docs/en/user-guide/UM10204.pdf) [[mirror](documents/UM10204.pdf)]
 - For more info and an I2C implementation in BascomAVR/assembly see [Elektor 2009-01 page 52-54](https://www.elektormagazine.nl/magazine/elektor-200901/15674/).
 
 ## Disclaimer
