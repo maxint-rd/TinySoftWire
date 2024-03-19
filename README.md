@@ -46,7 +46,7 @@ void loop() {
 }
 ```
 
-To make the ATtiny I2C device more useful, it can accept single byte commands, such as a command to change the I2C address. The internal EEPROM of the ATtiny can be used to store the changed address. Most [library examples](/examples) implement a [special I2C protocol](#t13i2c-protocol) for easy configuration of ATtiny I2C devices using the included [T13I2C device configurator](examples/mxT13_I2C_device_configurator) sketch.
+To make the ATtiny I2C device more useful, it can be programmed to accept single byte commands, such as a command to change the I2C address. The internal EEPROM of the ATtiny can be used to store the changed address. Most [library examples](/examples) implement a [special I2C protocol](#t13i2c-protocol) for easy configuration of ATtiny I2C devices using the included [T13I2C device configurator](examples/mxT13_I2C_device_configurator) sketch.
 
 This library uses polling to implement [I2C](#i2c-protocol-simplified). (Unfortunately interrupts seem to be too slow on the ATtiny13A @ 9.6MHz). For that reason continuous calls to _TinySoftWire::process()_ are required and the actual processing of received data/commands needs to be done quickly.
 
@@ -64,7 +64,7 @@ if(myWire.getLastStatus()==I2C_STATUS_WRITE && nProcessed)
     myWire.setDataU8(0, _i2cAddress);
     break;
   case 0xFF:  // get the device type id, used to identify the device type
-    myWire.setDataU32(0, 0xCODEDBAD);  // a 4-byte HEX-value can form a recognizable type ID 
+    myWire.setDataU32(0, 0xC0DEDBAD);  // a 4-byte HEX-value can form a human-readable type ID 
     break;
    }
 }
