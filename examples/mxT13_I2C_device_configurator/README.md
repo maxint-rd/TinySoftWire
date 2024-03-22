@@ -1,6 +1,7 @@
 # T13I2C device configurator
 
-Arduino utility sketch to configure T13I2C devices. T13I2C devices are I2C slave devices that use the T13I2C protocol for configuration.
+Arduino utility sketch to configure and test T13I2C devices. Scan, write/read data, test frequency of generic I2C devices; change address, show device type of T13I2C devices.
+T13I2C devices are I2C slave devices that use the T13I2C protocol for configuration. 
 
 ## T13I2C protocol
 Using the TinySoftWire library an ATtiny13A can receive I2C data. To make configuring ATtiny I2C devices easier, a common protocol can be implemented. When using this T13I2C protocol, data is preceeded by single-byte commands. Commands F0-FF are reserved for special common purposes. The reserved commands depend on the device, but may include the following:
@@ -12,7 +13,7 @@ Using the TinySoftWire library an ATtiny13A can receive I2C data. To make config
 
 *) When in data mode sending the device type ID to the device switches back to command mode.
 
-See the [library examples](/examples) for more information on how they implement the T13I2C protocol.
+See the [library examples](/examples) for more information on how they implement the T13I2C protocol
 
 ## Compatibility
 This sketch was tested succesfully in various Arduino environments:
