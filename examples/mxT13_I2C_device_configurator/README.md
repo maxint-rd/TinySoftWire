@@ -19,7 +19,8 @@ This sketch was tested succesfully in various Arduino environments:
 - Arduino Nano
 - ESP8266
 - LGT8F328P
-- CH32V003
+- CH32V003 (no space for freq testing)
+
 The I2C scanning feature can be used to scan generic I2C devices, but only T13I2C devices enable the extra menu items for configuration.
 
 ## Usage notes
