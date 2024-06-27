@@ -5,7 +5,7 @@ Make peripheral devices such as sensors using software I2C on ATtiny MCUs. Examp
 
 DISCLAIMER - This library is work-in-progress. **USE AT YOUR OWN RISK!**
 
-TinySoftWare is an I2C peripheral library for bitbanging I2C on the ATtiny13A and similar processors.
+TinySoftWire is an I2C peripheral library for bitbanging I2C on the ATtiny13A and similar processors.
 Turn the ATtiny13A into an I2C device that properly responds to an I2C controller.
 Using this library the ATtiny13A at 9.6MHz can perform 100kbps [I2C communication](#i2c-protocol-simplified).
 It can receive write commands and respond to read data-requests for the set I2C address.
