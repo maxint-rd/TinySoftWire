@@ -92,13 +92,13 @@ Use the [T13I2C device configurator](examples/mxT13_I2C_device_configurator) ske
 - Unfortunately interrupts seem to be too slow on the ATtiny13A @ 9.6MHz, requiring continuous calls to TinySoftWire::process().
 - Using this library the ATtiny13A at 9.6MHz can perform 100kHz I2C communication. Recognizing the address and acking after clock-pulse 8 now takes 4.5us. At 100Kbps each pulse is only 5us, so 400 kHz is much too fast.
 - This library only implements 7-bit addressing. General call write/read at address 0x00 is not implemented.
-- No clock-stretching was implemented (SLC is not kept low while prepping data).
+- No clock-stretching was implemented (SCL is not kept low while prepping data).
 - To keep things small and simple the internal buffer is only 4-bytes long. This size is defined in [TinySoftWire.h](src/TinySoftWire.h) and could be increased, but that would require implementation of supporting functions.
 
 ## More information
 
 ### Solving I2C communication problems
-- The relatively slow processing of the ATtiny13A may cause lost clock pulses and data changes. Most critical is sending back the acknowledgement in time. All data processing should be done as quickly as possible. Sometimes adding/changing pull-up resistors on the I2C lines can help. When processors such as the CH32V003 as controller, these are essential, but on others they seem not required.  In my experiments with an ESP8266 I found adding capacitors much more helpful. Place low value capacitors (<400pF, see table 10 of I2C specs) between SDA/SCL and ground. Having such a capacitor only on SCL (A5) may improve communication sufficiently. Effectively this delays the signals a bit, 47pF worked fine for me.
+- The relatively slow processing of the ATtiny13A may cause lost clock pulses and data changes. Most critical is sending back the acknowledgement in time. All data processing should be done as quickly as possible. Sometimes adding/changing pull-up resistors on the I2C lines can help. When using processors such as the CH32V003 as controller these are essential, but on others they seem not required. In my experiments with an ESP8266 I found adding capacitors much more helpful. Place low value capacitors (<400pF, see table 10 of I2C specs) between SDA/SCL and ground. Having such a capacitor only on SCL (A5) may improve communication sufficiently. Effectively this delays the signals a bit, 47pF worked fine for me.
 - Having long wires and loose breadboard connections may cause noise and weak signals. This is more problematic at higher speeds. Try to keep the length short and verify the connection.
 - Alternatively one can change the speed of the I2C communication. Using Wire.setClock() may be limited to few supported speeds. On the Atmel chips such as the ATmega328P (and LGT8F328P) one can set the TWBR/TWPS registers. (Higher TWBR values result in lower speeds). See for more info [this fine post](http://www.gammon.com.au/forum/?id=10896) by Nick Gammon. Note that the time-outs set in the T13I2C library prevent support of very low speeds (below 10kHz).
 
